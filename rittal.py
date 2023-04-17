@@ -10,10 +10,9 @@ import argparse
 def main(args):
 
     # Prompt the user to enter their login credentials
-    # username = input("Enter your username: ")
-    # password = input("Enter your password: ")
-    username = "admin"
-    password = "electricityOverlaod"
+    username = input("Enter your username: ")
+    password = input("Enter your password: ")
+
 
     # Launch the browser and navigate to your website
     browser = webdriver.Chrome("chromedriver")
