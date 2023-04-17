@@ -3,43 +3,60 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+import time
+import argparse
 
-# Prompt the user to enter their login credentials
-username = input("Enter your username: ")
-password = input("Enter your password: ")
 
-# Launch the browser and navigate to your website
-browser = webdriver.Chrome()
-browser.get("http://localhost:8080")
+def main(args):
 
-# Click the "Login to Dashboard" button
-login_button = browser.find_element(By.XPATH, "//button[contains(text(), 'Login to Dashboard')]")
-login_button.click()
+    # Prompt the user to enter their login credentials
+    # username = input("Enter your username: ")
+    # password = input("Enter your password: ")
+    username = "admin"
+    password = "electricityOverlaod"
 
-# Wait for the login page to load and enter the credentials
-username_field = WebDriverWait(browser, 10).until(
-    EC.presence_of_element_located((By.ID, "username"))
-)
-username_field.send_keys(username)
-password_field = browser.find_element_by_id("password")
-password_field.send_keys(password)
-submit_button = browser.find_element_by_xpath("//button[contains(text(), 'Log in')]")
-submit_button.click()
+    # Launch the browser and navigate to your website
+    browser = webdriver.Chrome("chromedriver")
+    browser.get("http://localhost:8080")
 
-# Wait for the page to load and select "Dashboard 1" from the drop-down list
-select_board = WebDriverWait(browser, 10).until(
-    EC.presence_of_element_located((By.ID, "selected_board"))
-)
-select_board.click()
-dashboard1_option = browser.find_element_by_xpath("//option[contains(text(), 'Dashboard 1')]")
-dashboard1_option.click()
+    browser.find_element("id","loginUsername").send_keys(username)
+    browser.find_element("id","loginPassword").send_keys(password)
 
-# Wait for the page to load and extract data from the first table
-table = WebDriverWait(browser, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//table[1]"))
-)
-soup = BeautifulSoup(table.get_attribute('outerHTML'), 'html.parser')
-# Parse the table using BeautifulSoup and extract the required data
+    browser.find_element("id","dijit_form_Button_0").click()   # Login
 
-# Close the browser
-browser.quit()
+    WebDriverWait(driver=browser, timeout=10).until(
+        lambda x: x.execute_script("return document.readyState === 'complete'")
+    )
+    error_message = "Incorrect username or password."
+    errors = browser.find_elements("css selector", ".flash-error")
+
+    if any(error_message in e.text for e in errors):
+        print("[!] Login failed")
+    else:
+        print("[+] Login successful")
+
+    time.sleep(5) # Wait for page to load
+
+
+    browser.find_elements(By.CLASS_NAME,"dojoxGridExpandoNode")[1].click()
+
+
+    table = browser.find_element("id","pdu3TotalTable") # Store whole table 
+
+    print(table.text)
+
+
+
+    time.sleep(5)
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Get data from Watts Up power meter.')
+    parser.add_argument('-s', '--sample-interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
+    parser.add_argument('-t', '--timeout', dest='timeout', default=10.0, type=float, help='Timeout for experiment (default 10 s)')
+    parser.add_argument('-l', '--log', dest='log', action='store_true', help='log data in real time')
+    # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
+
+    args = parser.parse_args()
+    main(args)
