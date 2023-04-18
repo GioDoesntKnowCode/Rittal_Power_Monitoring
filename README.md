@@ -15,7 +15,7 @@ Power Monitoring system for Rittal PDU systems
 Rittal PDU systems have an HTML interface which allows for administrators to access and make changes, or view parts of the system.
 The PDU systems have an interface which allows for adminstrators to view the live power, voltage and current readings of the phases. The aim of this project is to be used for individual socket monitoring, though at the time of writing I am still waiting on Rittal to confirm whether this is indeed possible. 
 
-In the meantime this can be used to monitor several machines connected to a phase or a single machine. 
+In the meantime this can be used to monitor several machines or a single machine connected to a phase. 
 
 ![Setup Diagram](https://user-images.githubusercontent.com/50869390/232887333-dfe6700d-36d0-4591-a074-5dfbd3e99045.jpg)
 
@@ -65,7 +65,8 @@ pip install beautifulsoup4
 ```
 ### Hardware
 There must be a device that is connected via ethernet to the Rittal system, in order to connect to the device, your machine must 
-have an ip begining with 192.168.0.xxx, the Rittal webpage is accessible on 192.168.0.200.
+have an IP begining with 192.168.0.xxx, the Rittal webpage is accessible on 192.168.0.200.
+
 *** For the above to work, the machine will need two means of connecting to the internet, one via ethernet(PDU), and the other for ssh.
 
 In the case of our setup, there are two ethernet connections to the "Host" machine, 1 to the PDU, 1 to the internet for ssh.
