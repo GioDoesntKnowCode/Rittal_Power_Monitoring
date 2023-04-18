@@ -2,30 +2,33 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import time,datetime
 import argparse
-
-
+import curses
+import getpass
 
 class monitor(object):
     def __init__(self, interval):
         self.interval = interval
-        self.browser = webdriver.Chrome("chromedriver")
+        self.username = input("Enter your username: ")
+        self.password = getpass.getpass("Enter your password: ")
+
+        options = Options()
+        options.add_argument('--headless')
+        self.browser = webdriver.Chrome(options=options)
+        # self.browser = webdriver.Chrome("chromedriver")       ## Open browser visibily
+
         self.phase, self.voltage, self.current, self.power, self.energy = -1,-1,-1,-1,-1
         self.logfile = None
 
     def login(self):
-         # Prompt the user to enter their login credentials
-        username = input("Enter your username: ")
-        password = input("Enter your password: ")
-     
-
-        # Launch the browser and navigate to your website
+        # Launch the webpage and navigate to your website
         self.browser.get("http://localhost:8080")
 
-        self.browser.find_element("id","loginUsername").send_keys(username)
-        self.browser.find_element("id","loginPassword").send_keys(password)
+        self.browser.find_element("id","loginUsername").send_keys(self.username)
+        self.browser.find_element("id","loginPassword").send_keys(self.password)
 
         self.browser.find_element("id","dijit_form_Button_0").click()   # Login
 
@@ -60,34 +63,62 @@ class monitor(object):
         self.energy = float(energy)
 
     def log(self, logfile = None):
-            if logfile:
-                self.logfile = logfile
-                o = open(self.logfile,'w')
+        if logfile:
+            self.logfile = logfile
+            o = open(self.logfile,'w')
 
-            n = 0
-            timeout_start = time.time()
-            
+        n = 0
+        timeout_start = time.time()
+        
 
-            while time.time() < timeout_start + args.timeout:
+        while time.time() < timeout_start + args.timeout:
 
-                self.extractData
-                if self.logfile:
-                    o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
-                n += 1
-                time.sleep(self.interval)
-            try:
-                o.close()
-            except:
-                pass
+            self.extractData()
+            if self.logfile:
+                o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
+            n += 1
+            time.sleep(self.interval)
+
+        try:
+            o.close()
+        except:
+            pass
+        
+        print("Logged Succesfully")
 
     def displayReadings(self):
-        print("For Phase: ", self.phase)
-        print("Voltage[V]: ", self.voltage)
-        print("Current[A]: ", self.current)
-        print("Power[W]: ", self.power)
-        print("Energy[kWh]: ", self.energy)
-            
-        
+        screen = curses.initscr()
+        curses.noecho()
+        curses.cbreak()
+        screen.nodelay(1)
+        try:
+            curses.curs_set(0)
+        except:
+            pass
+        n = 0
+        while True:
+            self.extractData()
+
+            screen.clear()
+            screen.addstr(2, 4, 'Logging from Phase %s' % self.phase)
+            screen.addstr(4, 4, 'Time:     %d s' % n)
+            screen.addstr(5, 4, 'Power:   %3.1f W' % self.power)
+            screen.addstr(6, 4, 'Voltage: %5.1f V' % self.voltage)
+            if self.current<1000:
+                screen.addstr(7, 4, 'Current: %d mA' % int(self.current))
+            else:
+                screen.addstr(7, 4, 'Current: %3.3f A' % self.current)
+            screen.addstr(9, 4, 'Press "q" to quit ')
+            n += 1
+            time.sleep(self.interval)
+            screen.refresh()
+            c = screen.getch()
+            if c in (ord('q'), ord('Q')):
+                break  # Exit the while()
+        curses.nocbreak()
+        curses.echo()
+        curses.endwin()
+
 
     def logout(self): ### ---W I P---
         self.browser.find_element("xpath","//button[@xpath='1']").click()
@@ -100,7 +131,8 @@ def main(args):
     logger.login()
     logger.extractData()
     time.sleep(5)
-    logger.log(args.outfile)
+    # logger.log(args.outfile)
+    logger.displayReadings()
 
     time.sleep(5)
 
