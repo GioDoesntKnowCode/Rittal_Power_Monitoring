@@ -10,11 +10,12 @@ import curses
 import getpass
 
 class monitor(object):
-    def __init__(self, interval):
-        self.interval = interval
-        self.username = input("Enter your username: ")
-        self.password = getpass.getpass("Enter your password: ")
-
+    def __init__(self):
+        self.interval = args.timeout
+        # self.username = input("Enter your username: ")
+        # self.password = getpass.getpass("Enter your password: ")
+        self.username = "admin"
+        self.password = "markZuckIsWatching"
         options = Options()
         options.add_argument('--headless')
         self.browser = webdriver.Chrome(options=options)
@@ -127,7 +128,7 @@ class monitor(object):
 
 def main(args):
 
-    logger = monitor(1)
+    logger = monitor()
     logger.login()
     logger.extractData()
     time.sleep(5)
