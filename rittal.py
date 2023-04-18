@@ -11,11 +11,11 @@ import getpass
 
 class monitor(object):
     def __init__(self):
-        self.interval = args.timeout
-        # self.username = input("Enter your username: ")
-        # self.password = getpass.getpass("Enter your password: ")
-        self.username = "admin"
-        self.password = "markZuckIsWatching"
+        self.interval = args.interval
+        self.username = input("Enter your username: ")
+        self.password = getpass.getpass("Enter your password: ")
+
+        print("Logging in..")
         options = Options()
         options.add_argument('--headless')
         self.browser = webdriver.Chrome(options=options)
@@ -44,14 +44,13 @@ class monitor(object):
         else:
             print("[+] Login successful")
 
+        print("Waiting on page to load..")
         time.sleep(5) # Wait for page to load
 
         self.browser.find_elements(By.CLASS_NAME,"dojoxGridExpandoNode")[1].click()
 
 
     def extractData(self):
-
-
         table = self.browser.find_element("id","pdu3TotalTable") # Store whole table 
 
         shortlist = table.text.split('\n')
@@ -132,10 +131,8 @@ def main(args):
     logger.login()
     logger.extractData()
     time.sleep(5)
-    # logger.log(args.outfile)
-    logger.displayReadings()
-
-    time.sleep(5)
+    # logger.log(args.outfile)  # Just Logging
+    logger.displayReadings()  # For Live readings
 
 
 
@@ -145,7 +142,7 @@ def main(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Get data from Watts Up power meter.')
-    parser.add_argument('-s', '--sample-interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
+    parser.add_argument('-i', '--interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
     parser.add_argument('-t', '--timeout', dest='timeout', default=10.0, type=float, help='Timeout for experiment (default 10 s)')
     parser.add_argument('-o', '--outfile', dest='outfile', default='log.out', help='Output file')
     # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
