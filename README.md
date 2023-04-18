@@ -1,20 +1,82 @@
 # Rittal_Power_Monitoring
 Power Monitoring system for Rittal PDU systems
 
-
 *** Work In Progress ***
 
+## Contents
+1. Introduction
+2. Usage
+3. Setup
+4. Prerequisites
+5. Notes
+
+## Introduction 
+
+Rittal PDU systems have an HTML interface which allows for administrators to access and make changes, or view parts of the system.
+The PDU systems have an interface which allows for adminstrators to view the live power, voltage and current readings of the phases. The aim of this project is to be used for individual socket monitoring, though at the time of writing I am still waiting on Rittal to confirm whether this is indeed possible. 
+
+In the meantime this can be used to monitor several machines connected to a phase or a single machine. 
+
+![Setup Diagram](https://user-images.githubusercontent.com/50869390/232887333-dfe6700d-36d0-4591-a074-5dfbd3e99045.jpg)
+
+The script works by scraping the live values off the interface below
+<img width="736" alt="PDU Screen" src="https://user-images.githubusercontent.com/50869390/232888681-37b75760-a527-4cab-98ef-8839fe92bc32.PNG">
+
+
+
+## Usage
+
+### Enable port forwarding (Automatically) 
+This can be done from the root directory by running the below command, which will prompt you for credentials and automatically connect.
+** Note that this is designed to work on Mac
+```
+ ./network/make_connection.sh 
+```
+You may need to give permission to the make_connection.sh file
+```
+chmod +x make_connection.sh
+```
+
+### Enable port forwarding (Manually) 
+If you want to set it up manually you can by running the following commands:
+On your Local machine:
+```
+ssh -L 8080:<host_ip_A>:80 <user>@<machine_ip_C> ## For most rittal systems, host ip is: 192.168.0.200
+```
+On Host machine:
+```
+ssh -R 8080:localhost:80 <user>@localhost
+```
+
+### Run Script
+```
+python3 rittal.py
+```
+
+Output will be stored in a log file: "log.out"
+Format: Time | N | Phase | Voltage | Current | Power | Energy
 
 ## Setup
 
+### Dependencies
 ```
 pip install selenium
 pip install beautifulsoup4
 ```
+### Hardware
+There must be a device that is connected via ethernet to the Rittal system, in order to connect to the device, your machine must 
+have an ip begining with 192.168.0.xxx, the Rittal webpage is accessible on 192.168.0.200.
+*** For the above to work, the machine will need two means of connecting to the internet, one via ethernet(PDU), and the other for ssh.
+
+In the case of our setup, there are two ethernet connections to the "Host" machine, 1 to the PDU, 1 to the internet for ssh.
+
+
+## Prerequisites 
+Must have Chrome installed
 
 ## Notes 
 
-If scripts don't run permissions may need to be adjusted 
+If scripts don't run, permissions may need to be adjusted 
 
 ```
 chmod +x make_connection.sh
