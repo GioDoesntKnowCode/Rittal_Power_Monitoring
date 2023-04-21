@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+
 from bs4 import BeautifulSoup
 import time,datetime
 import argparse
@@ -14,19 +16,20 @@ class monitor(object):
         self.interval = args.interval
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
-
+        chrome_driver_path = "./chromedriver"
         print("Logging in..")
-        options = Options()
+        
+        options = webdriver.ChromeOptions()
         options.add_argument('--headless')
-        self.browser = webdriver.Chrome(options=options)
-        # self.browser = webdriver.Chrome("chromedriver")       ## Open browser visibily
+        options.add_argument('--no-sandbox')
 
+        self.browser = webdriver.Chrome(service=Service(executable_path=chrome_driver_path), options=options)
         self.phase, self.voltage, self.current, self.power, self.energy = -1,-1,-1,-1,-1
         self.logfile = None
 
     def login(self):
         # Launch the webpage and navigate to your website
-        self.browser.get("http://localhost:8080")
+        self.browser.get("http://192.168.0.200")
 
         self.browser.find_element("id","loginUsername").send_keys(self.username)
         self.browser.find_element("id","loginPassword").send_keys(self.password)
