@@ -48,8 +48,11 @@ In the case of our setup, there are two ethernet connections to the "Host" machi
 ## 3. Usage
 
 ### Enable port forwarding (Automatically) 
+** If your system is connected directly to the Rittal PDU, you can skip this step
+
 This can be done from the root directory by running the below command, which will prompt you for credentials and automatically connect.
 ** Note that this is designed to work on Mac
+
 ```
  ./network/make_connection.sh 
 ```
