@@ -3,30 +3,50 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+
 from bs4 import BeautifulSoup
 import time,datetime
 import argparse
 import curses
 import getpass
+import sys
+
 
 class monitor(object):
     def __init__(self):
         self.interval = args.interval
+        print("Rittal Credentials")
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
+        self.ip = args.network
+
+
 
         print("Logging in..")
-        options = Options()
-        options.add_argument('--headless')
-        self.browser = webdriver.Chrome(options=options)
-        # self.browser = webdriver.Chrome("chromedriver")       ## Open browser visibily
+        
+        options = webdriver.ChromeOptions()
+        if args.headless.lower() == 'true':
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+
+
+        if args.system == "MACOS":              
+            self.browser = webdriver.Chrome(options=options)
+        elif args.system == "LTS":
+            chrome_driver_path = "./chromedrivers/chromedriveramd"
+            self.browser = webdriver.Chrome(service=Service(executable_path=chrome_driver_path), options=options)
+   
+        else:
+            print("ERROR: Only configuired for MACOS and LTS")
+            sys.exit()
 
         self.phase, self.voltage, self.current, self.power, self.energy = -1,-1,-1,-1,-1
         self.logfile = None
 
     def login(self):
         # Launch the webpage and navigate to your website
-        self.browser.get("http://localhost:8080")
+        self.browser.get(self.ip)  # Rittal System: http://192.168.0.200 || Port Forwarding: http://localhost:8080
 
         self.browser.find_element("id","loginUsername").send_keys(self.username)
         self.browser.find_element("id","loginPassword").send_keys(self.password)
@@ -130,9 +150,9 @@ def main(args):
     logger = monitor()
     logger.login()
     logger.extractData()
-    time.sleep(5)
-    # logger.log(args.outfile)  # Just Logging
-    logger.displayReadings()  # For Live readings
+    # time.sleep(5)
+    logger.log(args.outfile)  # Just Logging
+    # logger.displayReadings()  # For Live readings
 
 
 
@@ -145,6 +165,10 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
     parser.add_argument('-t', '--timeout', dest='timeout', default=10.0, type=float, help='Timeout for experiment (default 10 s)')
     parser.add_argument('-o', '--outfile', dest='outfile', default='log.out', help='Output file')
+    parser.add_argument('-n', '--network', dest='network', default='http://localhost:8080', help='IP for Rittal interface (Dependent on System)')
+    parser.add_argument('-s', '--system', dest='system', default='MACOS', help='System for chromedriver')
+    parser.add_argument('-d', '--headless', dest='headless', default='True', help='Open chrome browser (Only possible on MAC)')
+
     # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
 
     args = parser.parse_args()
