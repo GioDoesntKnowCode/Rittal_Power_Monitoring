@@ -5,12 +5,13 @@ Power Monitoring system for Rittal PDU systems
 
 ## Contents
 1. Introduction
-2. Usage
-3. Setup
-4. Prerequisites
-5. Notes
+2. Setup
+3. Usage
+4. Flags
+5. Prerequisites
+6. Notes
 
-## Introduction 
+## 1. Introduction 
 
 Rittal PDU systems have an HTML interface which allows for administrators to access and make changes, or view parts of the system.
 The PDU systems have an interface which allows for adminstrators to view the live power, voltage and current readings of the phases. The aim of this project is to be used for individual socket monitoring, though at the time of writing I am still waiting on Rittal to confirm whether this is indeed possible. 
@@ -23,8 +24,28 @@ The script works by scraping the live values off the interface below
 <img width="736" alt="PDU Screen" src="https://user-images.githubusercontent.com/50869390/232888681-37b75760-a527-4cab-98ef-8839fe92bc32.PNG">
 
 
+## 2. Setup
 
-## Usage
+### Dependencies
+```
+pip install selenium
+```
+```
+pip install beautifulsoup4
+```
+```
+sudo apt-get install chromium-browser
+```
+### Hardware
+There must be a device that is connected via ethernet to the Rittal system, in order to connect to the device, your machine must 
+have an IP begining with 192.168.0.xxx, the Rittal webpage is accessible on 192.168.0.200.
+
+*** For the above to work, the machine will need two means of connecting to the internet, one via ethernet(PDU), and the other for ssh.
+
+In the case of our setup, there are two ethernet connections to the "Host" machine, 1 to the PDU, 1 to the internet for ssh.
+
+
+## 3. Usage
 
 ### Enable port forwarding (Automatically) 
 This can be done from the root directory by running the below command, which will prompt you for credentials and automatically connect.
@@ -49,36 +70,64 @@ ssh -R 8080:localhost:80 <user>@localhost
 ```
 
 ### Run Script
+#### MAC
 ```
 python3 rittal.py
+```
+#### Ubuntu LTS
+```
+python3 rittal.py -n http://192.168.0.200 -s LTS
 ```
 
 Output will be stored in a log file: "log.out"
 Format: Time | N | Phase | Voltage | Current | Power | Energy
 
-## Setup
+## 4. Flags
+There are a combination of flags that can be passed in to alter certain parts of the script
 
-### Dependencies
+#### Interval
+Adjust Duration of script in seconds
 ```
-pip install selenium
-pip install beautifulsoup4
+python3 -i 200
 ```
-### Hardware
-There must be a device that is connected via ethernet to the Rittal system, in order to connect to the device, your machine must 
-have an IP begining with 192.168.0.xxx, the Rittal webpage is accessible on 192.168.0.200.
+#### Timeout
+Adjust duration of script in seconds
+```
+python3 -t 100 
+```
+#### Output File
+Change the name of the output file
+```
+python3 -o beautifullog.out
+```
+#### Network
+Change the source of the Rittal interface
+```
+python3 -n http://192.168.0.200 
+```
+#### System
+Change the settings in the file based on the host system (MACOS|LTS)
+```
+python3 -s LTS
+```
+#### headless
+Display chromebrowser (Only possible on Mac) True = not visible 
+```
+python3 -d False
+```
 
-*** For the above to work, the machine will need two means of connecting to the internet, one via ethernet(PDU), and the other for ssh.
 
-In the case of our setup, there are two ethernet connections to the "Host" machine, 1 to the PDU, 1 to the internet for ssh.
+## 5. Prerequisites 
+Must have Chrome installed on Mac
+** In the case of ubuntu the above steps should be sufficient.
 
-
-## Prerequisites 
-Must have Chrome installed
-
-## Notes 
+## 6. Notes 
 
 If scripts don't run, permissions may need to be adjusted 
 
 ```
 chmod +x make_connection.sh
+```
+```
+chmod +x chromedriveramd
 ```
