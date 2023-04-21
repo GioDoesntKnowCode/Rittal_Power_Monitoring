@@ -16,7 +16,7 @@ class monitor(object):
         self.interval = args.interval
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
-        chrome_driver_path = "./chromedriver"
+        chrome_driver_path = "./chromedriveramd"      # UbuntuLts: chromedriveramd || Mac: chromedrivermac
         print("Logging in..")
         
         options = webdriver.ChromeOptions()
@@ -29,7 +29,7 @@ class monitor(object):
 
     def login(self):
         # Launch the webpage and navigate to your website
-        self.browser.get("http://192.168.0.200")
+        self.browser.get("http://192.168.0.200")  # Common IP for Rittal System
 
         self.browser.find_element("id","loginUsername").send_keys(self.username)
         self.browser.find_element("id","loginPassword").send_keys(self.password)
@@ -133,9 +133,9 @@ def main(args):
     logger = monitor()
     logger.login()
     logger.extractData()
-    time.sleep(5)
-    # logger.log(args.outfile)  # Just Logging
-    logger.displayReadings()  # For Live readings
+    # time.sleep(5)
+    logger.log(args.outfile)  # Just Logging
+    # logger.displayReadings()  # For Live readings
 
 
 
