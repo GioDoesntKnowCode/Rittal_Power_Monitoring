@@ -19,9 +19,6 @@ class monitor(object):
         print("Rittal Credentials")
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
-        self.ip = args.network
-
-
 
         print("Logging in..")
         
@@ -61,6 +58,7 @@ class monitor(object):
 
         if any(error_message in e.text for e in errors):
             print("[!] Login failed")
+            sys.exit()
         else:
             print("[+] Login successful")
 
@@ -75,7 +73,7 @@ class monitor(object):
 
         shortlist = table.text.split('\n')
 
-        phase, voltage, current, power, energy = shortlist[1].split(" ")[:5]
+        phase, voltage, current, power, energy = shortlist[self.phaseMeasure].split(" ")[:5]
         self.phase = phase
         self.voltage = float(voltage)
         self.current = float(current)
@@ -150,9 +148,9 @@ def main(args):
     logger = monitor()
     logger.login()
     logger.extractData()
-    # time.sleep(5)
-    logger.log(args.outfile)  # Just Logging
-    # logger.displayReadings()  # For Live readings
+    time.sleep(5)
+    # logger.log(args.outfile)  # Just Logging
+    logger.displayReadings()  # For Live readings
 
 
 
@@ -165,10 +163,6 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
     parser.add_argument('-t', '--timeout', dest='timeout', default=10.0, type=float, help='Timeout for experiment (default 10 s)')
     parser.add_argument('-o', '--outfile', dest='outfile', default='log.out', help='Output file')
-    parser.add_argument('-n', '--network', dest='network', default='http://localhost:8080', help='IP for Rittal interface (Dependent on System)')
-    parser.add_argument('-s', '--system', dest='system', default='MACOS', help='System for chromedriver')
-    parser.add_argument('-d', '--headless', dest='headless', default='True', help='Open chrome browser (Only possible on MAC)')
-
     # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
 
     args = parser.parse_args()
