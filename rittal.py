@@ -19,6 +19,18 @@ class monitor(object):
         print("Rittal Credentials")
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
+        self.ip = args.network
+        
+        if args.phase == 'L1':
+            self.phaseMeasure = 1
+        elif args.phase == 'L2':
+            self.phaseMeasure = 2
+        elif args.phase == 'L3':
+            self.phaseMeasure = 3
+        else:
+            print("Phase does not exist")
+            sys.exit()
+
 
         print("Logging in..")
         
@@ -148,7 +160,7 @@ def main(args):
     logger = monitor()
     logger.login()
     logger.extractData()
-    time.sleep(5)
+    # time.sleep(5)
     # logger.log(args.outfile)  # Just Logging
     logger.displayReadings()  # For Live readings
 
@@ -163,6 +175,11 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--interval', dest='interval', default=2.0, type=float, help='Sample interval (default 2 s)')
     parser.add_argument('-t', '--timeout', dest='timeout', default=10.0, type=float, help='Timeout for experiment (default 10 s)')
     parser.add_argument('-o', '--outfile', dest='outfile', default='log.out', help='Output file')
+    parser.add_argument('-n', '--network', dest='network', default='http://localhost:8080', help='IP for Rittal interface (Dependent on System)')
+    parser.add_argument('-s', '--system', dest='system', default='MACOS', help='System for chromedriver')
+    parser.add_argument('-d', '--headless', dest='headless', default='True', help='Open chrome browser (Only possible on MAC)')
+    parser.add_argument('-p', '--phase', dest='phase', default='L1', help='Select Phase')
+
     # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
 
     args = parser.parse_args()
