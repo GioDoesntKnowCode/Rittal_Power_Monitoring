@@ -91,32 +91,38 @@ There are a combination of flags that can be passed in to alter certain parts of
 #### Interval
 Adjust Duration of script in seconds
 ```
-python3 -i 200
+python3 rittal.py -i 200
 ```
 #### Timeout
 Adjust duration of script in seconds
 ```
-python3 -t 100 
+python3 rittal.py -t 100 
 ```
 #### Output File
 Change the name of the output file
 ```
-python3 -o beautifullog.out
+python3 rittal.py -o beautifullog.out
 ```
 #### Network
 Change the source of the Rittal interface
 ```
-python3 -n http://192.168.0.200 
+python3 rittal.py -n http://192.168.0.200 
 ```
 #### System
 Change the settings in the file based on the host system (MACOS|LTS)
 ```
-python3 -s LTS
+python3 rittal.py -s LTS
 ```
 #### headless
 Display chromebrowser (Only possible on Mac) True = not visible 
 ```
-python3 -d False
+python3 rittal.py -d False
+```
+
+#### Phase
+Select which phase to record from (Default L1)
+```
+python3 rittal.py -p L2
 ```
 
 
