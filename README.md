@@ -1,8 +1,6 @@
 # Rittal_Power_Monitoring
 Power Monitoring system for Rittal PDU systems
 
-*** Work In Progress ***
-
 ## Contents
 1. Introduction
 2. Setup
@@ -14,9 +12,9 @@ Power Monitoring system for Rittal PDU systems
 ## 1. Introduction 
 
 Rittal PDU systems have an HTML interface which allows for administrators to access and make changes, or view parts of the system.
-The PDU systems have an interface which allows for adminstrators to view the live power, voltage and current readings of the phases. The aim of this project is to be used for individual socket monitoring, though at the time of writing I am still waiting on Rittal to confirm whether this is indeed possible. 
+The PDU interface allows for adminstrators to view the live power, voltage and current readings of the phases. The aim of this project is to be used for individual socket monitoring, though at the time of writing this, I do not have access to a "Metered Plus" PDU and only a "Metered" PDU, so as a result this can only record Phases, though it should be easy to adapt this code to work on the "Metered Plus" with minor changes.
 
-In the meantime this can be used to monitor several machines or a single machine connected to a phase. 
+At present the script can monitor one phase at a time
 
 ![Setup Diagram](https://user-images.githubusercontent.com/50869390/232887333-dfe6700d-36d0-4591-a074-5dfbd3e99045.jpg)
 
