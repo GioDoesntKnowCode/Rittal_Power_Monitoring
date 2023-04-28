@@ -100,7 +100,7 @@ class monitor(object):
         n = 0
         timeout_start = time.time()
         
-
+        print("Logging...")
         while time.time() < timeout_start + args.timeout:
 
             self.extractData()
@@ -161,8 +161,8 @@ def main(args):
     logger.login()
     logger.extractData()
     # time.sleep(5)
-    # logger.log(args.outfile)  # Just Logging
-    logger.displayReadings()  # For Live readings
+    logger.log(args.outfile)  # Just Logging
+    # logger.displayReadings()  # For Live readings
 
 
 
