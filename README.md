@@ -87,9 +87,9 @@ Format: Time | N | Phase | Voltage | Current | Power | Energy
 There are a combination of flags that can be passed in to alter certain parts of the script
 
 #### Interval
-Adjust Duration of script in seconds
+Adjust Interval beween measurements of script in seconds(Default 2)
 ```
-python3 rittal.py -i 200
+python3 rittal.py -i 1
 ```
 #### Timeout
 Adjust duration of script in seconds
