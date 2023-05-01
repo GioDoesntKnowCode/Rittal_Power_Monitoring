@@ -8,6 +8,7 @@ Power Monitoring script for Rittal PDU systems
 4. Flags
 5. Prerequisites
 6. Notes
+7. Benchmark
 
 ## 1. Introduction 
 
@@ -138,3 +139,11 @@ chmod +x make_connection.sh
 ```
 chmod +x chromedriveramd
 ```
+
+## 7. Benchmark
+To test its reliability, I ran `sudo stress --cpu 8 --io 4 --vm 2 --vm-bytes 1G ` for several minutes whilst recording the metrics,
+The setup was that the machine was connected to a Wattsup meter which was then connected to the Rittal PDU. 
+With logging from both the meter and the PDU, we can see a clear correlation between the readings, with a slightly higher reading on the PDU, which can be attributed to the Wattsup meters added power consumption.
+
+<img width="888" alt="Screenshot 2023-04-28 at 20 42 18" src="https://user-images.githubusercontent.com/50869390/235451573-d3337a03-5cb6-468d-a5f4-407ceb8ebed0.png">
+
