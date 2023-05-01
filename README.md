@@ -1,5 +1,5 @@
 # Rittal_Power_Monitoring
-Power Monitoring system for Rittal PDU systems
+Power Monitoring script for Rittal PDU systems
 
 ## Contents
 1. Introduction
