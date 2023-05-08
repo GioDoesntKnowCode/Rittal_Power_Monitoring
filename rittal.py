@@ -10,6 +10,8 @@ import time,datetime
 import argparse
 import curses
 import getpass
+import sys
+import requests
 
 class monitor(object):
     def __init__(self):
@@ -17,6 +19,19 @@ class monitor(object):
         print("Rittal Credentials")
         self.username = input("Enter your username: ")
         self.password = getpass.getpass("Enter your password: ")
+        self.ip = args.network
+        self.last_click_time = time.time()
+        
+        if args.phase == 'L1':
+            self.phaseMeasure = 1
+        elif args.phase == 'L2':
+            self.phaseMeasure = 2
+        elif args.phase == 'L3':
+            self.phaseMeasure = 3
+        else:
+            print("Phase does not exist")
+            sys.exit()
+
 
         print("Logging in..")
         
@@ -86,8 +101,9 @@ class monitor(object):
         n = 0
         timeout_start = time.time()
         
-
-        while time.time() < timeout_start + args.timeout:
+        print("Logging...")
+        try:
+            while time.time() < timeout_start + args.timeout:
 
                 if time.time() - self.last_click_time > 300:
                     requests.get(self.ip)
