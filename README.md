@@ -123,6 +123,12 @@ Select which phase to record from (Default L1)
 ```
 python3 rittal.py -p L2
 ```
+#### Multi-Phase
+Select several phases to record from (Default False)
+```
+python3 rittal.py -m 1,2,3
+```
+***Note that it is not compatible with `-o` flag yet, defaults to naming in format: Phase_1.log
 
 
 ## 5. Prerequisites 
