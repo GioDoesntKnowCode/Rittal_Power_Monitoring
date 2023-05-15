@@ -52,10 +52,8 @@ class monitor(object):
             sys.exit()
 
         self.phase, self.voltage, self.current, self.power, self.energy = -1,-1,-1,-1,-1
-        self.logfile_1 = None
-        self.logfile_2 = None
-        self.logfile_3 = None
-
+        self.logfiles = ['log1.out', 'log2.out', 'log3.out']
+        self.filehandles = []
 
     def login(self):
         # Launch the webpage and navigate to your website
@@ -107,8 +105,8 @@ class monitor(object):
 
     def log(self, logfile = None):
         if logfile:
-            self.logfile_1 = logfile
-            o = open(self.logfile_1,'w')
+            self.logfiles = logfile
+            o = open(self.logfiles,'w')
 
         n = 0
         timeout_start = time.time()
@@ -121,16 +119,13 @@ class monitor(object):
                     requests.get(self.ip)
                     self.last_click_time = time.time()
 
-
                 try:                # Sometimes the Rittal Interface auto-logs you out
                     self.extractData()  
                 except:
                     print("Auto-Logged out: Resolving..")
                     self.login()
 
-                    
-
-                if self.logfile_1:
+                if self.logfiles:
                     o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
                 n += 1
                 time.sleep(self.interval)
@@ -145,56 +140,48 @@ class monitor(object):
             print("Crashed at: " + str(n) + " " + str(datetime.datetime.now()))
             print(e)
 
-    def logMulti(self, logfile = None):
-        if logfile:
-
-            if args.multiple.lower() == 'false':
-                self.logfile_1 = logfile
-
-
-            self.logfile_1 = logfile
-            o = open(self.logfile_1,'w')
-
+    def logMulti(self):
+        if args.outfile != "log.out":
+            print("Error: -o flag doesn't work with multiphase logging yet, will use default file names")
         n = 0
         timeout_start = time.time()
-        
-        phases = args.multiple.split(",")       # Get phases to record
-        
+        phases = args.multiple.split(",")  # Get phases to record
+
         print("Logging...")
         try:
             while time.time() < timeout_start + args.timeout:
-
                 for phase in phases:
-                    print("Phase: ", phase)
+
                     if time.time() - self.last_click_time > 300:
                         requests.get(self.ip)
                         self.last_click_time = time.time()
 
-
-                    try:                # Sometimes the Rittal Interface auto-logs you out
-                        self.extractData(phase)  
+                    try:
+                        self.extractData(phase)
                     except:
                         print("Auto-Logged out: Resolving..")
                         self.login()
 
-                        
-
-                    if self.logfile_1:
-                        o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
+                    if self.logfiles:
+                        filename = "Phase_" + phase + ".log"  
+                        with open(filename, 'a') as file: 
+                            file.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % ( datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power,self.energy))  # SAVE TO LOG
                     n += 1
+
                 time.sleep(self.interval)
 
             try:
-                o.close()
+                for filehandle in self.filehandles:
+                    filehandle.close()
             except:
                 pass
-            print("Logged Readings Succesfully")
-            print("TEST")
+
+            print("Logged Readings Successfully")
 
         except Exception as e:
-            print("Crashed at: " + str(n) + " " + str(datetime.datetime.now()))
+            print("Crashed at:", str(n), str(datetime.datetime.now()))
             print(e)
-    
+
 
     def displayReadings(self):
         screen = curses.initscr()
@@ -244,7 +231,7 @@ def main(args):
     if args.multiple.lower() == 'false':
         logger.log(args.outfile)  # Just Logging
     else:
-        logger.logMulti(args.outfile)   # Log for several phases
+        logger.logMulti()   # Log for several phases
     # logger.displayReadings()  # For Live readings
 
 
