@@ -52,7 +52,10 @@ class monitor(object):
             sys.exit()
 
         self.phase, self.voltage, self.current, self.power, self.energy = -1,-1,-1,-1,-1
-        self.logfile = None
+        self.logfile_1 = None
+        self.logfile_2 = None
+        self.logfile_3 = None
+
 
     def login(self):
         # Launch the webpage and navigate to your website
@@ -76,17 +79,26 @@ class monitor(object):
             print("[+] Login successful")
 
         print("Waiting on page to load..")
-        time.sleep(1) # Wait for page to load
+        if args.system == "LTS":
+            time.sleep(1) # Wait for page to load
+        else:
+            time.sleep(3)
 
         self.browser.find_elements(By.CLASS_NAME,"dojoxGridExpandoNode")[1].click()
 
 
-    def extractData(self):
+    def extractData(self, multiMeasure = -1):
+
+        if multiMeasure ==-1: 
+            phaseMeasure = self.phaseMeasure
+        else:
+            phaseMeasure = int(multiMeasure)
+
         table = self.browser.find_element("id","pdu3TotalTable") # Store whole table 
 
         shortlist = table.text.split('\n')
 
-        phase, voltage, current, power, energy = shortlist[self.phaseMeasure].split(" ")[:5]
+        phase, voltage, current, power, energy = shortlist[phaseMeasure].split(" ")[:5]
         self.phase = phase
         self.voltage = float(voltage)
         self.current = float(current)
@@ -95,8 +107,8 @@ class monitor(object):
 
     def log(self, logfile = None):
         if logfile:
-            self.logfile = logfile
-            o = open(self.logfile,'w')
+            self.logfile_1 = logfile
+            o = open(self.logfile_1,'w')
 
         n = 0
         timeout_start = time.time()
@@ -118,7 +130,7 @@ class monitor(object):
 
                     
 
-                if self.logfile:
+                if self.logfile_1:
                     o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
                 n += 1
                 time.sleep(self.interval)
@@ -132,7 +144,57 @@ class monitor(object):
         except Exception as e:
             print("Crashed at: " + str(n) + " " + str(datetime.datetime.now()))
             print(e)
+
+    def logMulti(self, logfile = None):
+        if logfile:
+
+            if args.multiple.lower() == 'false':
+                self.logfile_1 = logfile
+
+
+            self.logfile_1 = logfile
+            o = open(self.logfile_1,'w')
+
+        n = 0
+        timeout_start = time.time()
         
+        phases = args.multiple.split(",")       # Get phases to record
+        
+        print("Logging...")
+        try:
+            while time.time() < timeout_start + args.timeout:
+
+                for phase in phases:
+                    print("Phase: ", phase)
+                    if time.time() - self.last_click_time > 300:
+                        requests.get(self.ip)
+                        self.last_click_time = time.time()
+
+
+                    try:                # Sometimes the Rittal Interface auto-logs you out
+                        self.extractData(phase)  
+                    except:
+                        print("Auto-Logged out: Resolving..")
+                        self.login()
+
+                        
+
+                    if self.logfile_1:
+                        o.write('%s %d %s %4.1f %2.2f %3.1f %3.1f\n' % (datetime.datetime.now(), n, self.phase, self.voltage, self.current, self.power, self.energy))  # SAVE TO LOG
+                    n += 1
+                time.sleep(self.interval)
+
+            try:
+                o.close()
+            except:
+                pass
+            print("Logged Readings Succesfully")
+            print("TEST")
+
+        except Exception as e:
+            print("Crashed at: " + str(n) + " " + str(datetime.datetime.now()))
+            print(e)
+    
 
     def displayReadings(self):
         screen = curses.initscr()
@@ -179,7 +241,10 @@ def main(args):
     logger.login()
     logger.extractData()
     # time.sleep(5)
-    logger.log(args.outfile)  # Just Logging
+    if args.multiple.lower() == 'false':
+        logger.log(args.outfile)  # Just Logging
+    else:
+        logger.logMulti(args.outfile)   # Log for several phases
     # logger.displayReadings()  # For Live readings
 
 
@@ -197,6 +262,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--system', dest='system', default='MACOS', help='System for chromedriver')
     parser.add_argument('-d', '--headless', dest='headless', default='True', help='Open chrome browser (Only possible on MAC)')
     parser.add_argument('-p', '--phase', dest='phase', default='L1', help='Select Phase')
+    parser.add_argument('-m', '--multiple', dest='multiple', default='False', help='Select Phases: 1,2,3')
 
     # parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
 
