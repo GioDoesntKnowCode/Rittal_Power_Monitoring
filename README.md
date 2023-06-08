@@ -9,6 +9,7 @@ Power Monitoring script for Rittal PDU systems
 5. Prerequisites
 6. Notes
 7. Benchmark
+8. Green-Lab Specific Information
 
 ## 1. Introduction 
 
@@ -147,3 +148,12 @@ With logging from both the meter and the PDU, we can see a clear correlation bet
 
 <img width="888" alt="Screenshot 2023-04-28 at 20 42 18" src="https://user-images.githubusercontent.com/50869390/235451573-d3337a03-5cb6-468d-a5f4-407ceb8ebed0.png">
 
+## 8. Green-Lab Specific Information
+
+The machines are connected to Phases, with only one machine per phase.
+
+| Machine       | Phase         |
+| ------------- | ------------- |
+| GL6           | Phase 1       |
+| GL2           | Phase 2       |
+| GL5           | Phase 3       |
