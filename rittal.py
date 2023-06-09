@@ -40,6 +40,7 @@ class monitor(object):
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
 
+        options.add_argument('--remote-debugging-port=9222')  # Add this line to enable remote debugging
 
         if args.system == "MACOS":              
             self.browser = webdriver.Chrome(options=options)
