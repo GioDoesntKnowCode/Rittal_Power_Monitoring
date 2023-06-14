@@ -50,6 +50,8 @@ In the case of our setup, there are two ethernet connections to the "Host" machi
 ### Enable port forwarding (Automatically) 
 ** If your system is connected directly to the Rittal PDU, you can skip this step
 
+*Note that when using the make_connection file, user & ip correspond to the machine your are trying to connect to that has access to the Rittal system
+
 This can be done from the root directory by running the below command, which will prompt you for credentials and automatically connect.
 ** Note that this is designed to work on Mac
 
@@ -78,6 +80,11 @@ ssh -R 8080:localhost:80 <user>@localhost
 python3 rittal.py
 ```
 #### Ubuntu LTS
+```
+python3 rittal.py -s LTS
+```
+
+#### Ubuntu LTS (Green Lab: From GL3)
 ```
 python3 rittal.py -n http://192.168.0.200 -s LTS
 ```
